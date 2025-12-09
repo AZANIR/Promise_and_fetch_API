@@ -1,0 +1,31 @@
+{
+  "name": "promise-and-fetch-api-examples",
+  "version": "1.0.0",
+  "description": "Приклади асинхронного коду в JavaScript: Callbacks, Promises, async/await та Fetch API",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha '**/*.test.js' --timeout 10000",
+    "test:watch": "mocha '**/*.test.js' --watch --timeout 10000",
+    "test:playwright": "playwright test",
+    "test:playwright:ui": "playwright test --ui"
+  },
+  "keywords": [
+    "javascript",
+    "async",
+    "promises",
+    "fetch",
+    "callbacks",
+    "async-await",
+    "testing",
+    "playwright",
+    "mocha"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "chai": "^4.3.10",
+    "mocha": "^10.2.0"
+  }
+}
+
