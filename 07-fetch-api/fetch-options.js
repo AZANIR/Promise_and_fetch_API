@@ -8,12 +8,12 @@
 // Приклад 1: GET запит (за замовчуванням)
 // ============================================
 
-fetch('https://api.example.com/users')
+fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available')
     .then(response => response.json())
     .then(data => console.log('GET дані:', data));
 
 // З явним вказанням методу
-fetch('https://api.example.com/users', {
+fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available', {
     method: 'GET'
 })
 .then(response => response.json())
@@ -23,14 +23,17 @@ fetch('https://api.example.com/users', {
 // Приклад 2: POST запит з JSON даними
 // ============================================
 
-fetch('https://api.example.com/users', {
+fetch('https://petstore.swagger.io/v2/pet', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-        name: 'Олена',
-        email: 'olena@example.com'
+        id: 0,
+        name: 'Барсик',
+        status: 'available',
+        category: { id: 1, name: 'Коти' },
+        photoUrls: ['https://example.com/cat.jpg']
     })
 })
 .then(response => response.json())
@@ -41,77 +44,97 @@ fetch('https://api.example.com/users', {
 // Приклад 3: POST запит з FormData
 // ============================================
 
-const formData = new FormData();
-formData.append('name', 'Олена');
-formData.append('email', 'olena@example.com');
-formData.append('file', fileInput.files[0]); // Якщо є файл
+// Примітка: Petstore API не підтримує FormData для створення тварин
+// Але показуємо приклад FormData для інших API, які підтримують multipart/form-data
+// const formData = new FormData();
+// formData.append('name', 'Барсик');
+// formData.append('status', 'available');
+// formData.append('file', fileInput.files[0]); // Якщо є файл
 
-fetch('https://api.example.com/users', {
-    method: 'POST',
-    body: formData
-    // Content-Type встановлюється автоматично для FormData
-})
-.then(response => response.json())
-.then(data => console.log('POST з FormData:', data));
+// Приклад з FormData (для API, які підтримують multipart/form-data)
+// fetch('https://api.example.com/upload', {
+//     method: 'POST',
+//     body: formData
+//     // Content-Type встановлюється автоматично для FormData
+// })
+// .then(response => response.json())
+// .then(data => console.log('POST з FormData:', data))
+// .catch(error => console.error('Помилка:', error));
+
+console.log('Примітка: Petstore API використовує JSON, а не FormData для створення тварин');
 
 // ============================================
 // Приклад 4: PUT запит (оновлення)
 // ============================================
 
-fetch('https://api.example.com/users/1', {
+fetch('https://petstore.swagger.io/v2/pet', {
     method: 'PUT',
     headers: {
         'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-        name: 'Олена Оновлена',
-        email: 'olena.updated@example.com'
+        id: 1,
+        name: 'Барсик Оновлений',
+        status: 'sold',
+        category: { id: 1, name: 'Коти' },
+        photoUrls: ['https://example.com/cat-updated.jpg']
     })
 })
 .then(response => response.json())
-.then(data => console.log('PUT результат:', data));
+.then(data => console.log('PUT результат:', data))
+.catch(error => console.error('Помилка PUT:', error));
 
 // ============================================
 // Приклад 5: PATCH запит (часткове оновлення)
 // ============================================
 
-fetch('https://api.example.com/users/1', {
-    method: 'PATCH',
+// Petstore API не має PATCH, але показуємо приклад для інших API
+// Використовуємо PUT для оновлення тварини
+fetch('https://petstore.swagger.io/v2/pet', {
+    method: 'PUT',
     headers: {
         'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-        email: 'newemail@example.com'
+        id: 1,
+        name: 'Барсик',
+        status: 'pending', // Змінюємо тільки статус
+        category: { id: 1, name: 'Коти' },
+        photoUrls: ['https://example.com/cat.jpg']
     })
 })
 .then(response => response.json())
-.then(data => console.log('PATCH результат:', data));
+.then(data => console.log('PUT результат (часткове оновлення):', data))
+.catch(error => console.error('Помилка:', error));
 
 // ============================================
 // Приклад 6: DELETE запит
 // ============================================
 
-fetch('https://api.example.com/users/1', {
-    method: 'DELETE'
+fetch('https://petstore.swagger.io/v2/pet/1', {
+    method: 'DELETE',
+    headers: {
+        'api_key': 'special-key' // Petstore API вимагає api_key для DELETE
+    }
 })
 .then(response => {
     if (response.ok) {
-        console.log('Користувач видалено');
+        console.log('Тварину видалено');
     } else {
         console.error('Помилка видалення');
     }
-});
+})
+.catch(error => console.error('Помилка:', error));
 
 // ============================================
 // Приклад 7: Запит з кастомними заголовками
 // ============================================
 
-fetch('https://api.example.com/users', {
+fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available', {
     method: 'GET',
     headers: {
-        'Authorization': 'Bearer token123',
-        'X-Custom-Header': 'custom-value',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'X-Custom-Header': 'custom-value'
     }
 })
 .then(response => response.json())
@@ -121,7 +144,7 @@ fetch('https://api.example.com/users', {
 // Приклад 8: Запит з credentials (cookies)
 // ============================================
 
-fetch('https://api.example.com/users', {
+fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available', {
     method: 'GET',
     credentials: 'include' // Включає cookies
 })
@@ -137,7 +160,7 @@ fetch('https://api.example.com/users', {
 // Приклад 9: Запит з режимом CORS
 // ============================================
 
-fetch('https://api.example.com/users', {
+fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available', {
     method: 'GET',
     mode: 'cors', // Дозволити CORS
     credentials: 'include'
@@ -154,7 +177,7 @@ fetch('https://api.example.com/users', {
 // Приклад 10: Запит з кешуванням
 // ============================================
 
-fetch('https://api.example.com/users', {
+fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available', {
     method: 'GET',
     cache: 'no-cache' // Не використовувати кеш
 })
@@ -172,7 +195,7 @@ fetch('https://api.example.com/users', {
 // Приклад 11: Запит з редиректами
 // ============================================
 
-fetch('https://api.example.com/users', {
+fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available', {
     method: 'GET',
     redirect: 'follow' // Слідувати редиректам
 })
@@ -190,16 +213,18 @@ fetch('https://api.example.com/users', {
 
 async function complexFetchRequest() {
     try {
-        const response = await fetch('https://api.example.com/users', {
+        const response = await fetch('https://petstore.swagger.io/v2/pet', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer token123',
                 'X-Request-ID': 'unique-id-123'
             },
             body: JSON.stringify({
-                name: 'Олена',
-                email: 'olena@example.com'
+                id: 0,
+                name: 'Барсик',
+                status: 'available',
+                category: { id: 1, name: 'Коти' },
+                photoUrls: ['https://example.com/cat.jpg']
             }),
             mode: 'cors',
             credentials: 'include',
@@ -291,15 +316,21 @@ class ApiClient {
 }
 
 // Використання
-const api = new ApiClient('https://api.example.com', {
-    'Authorization': 'Bearer token123'
+const api = new ApiClient('https://petstore.swagger.io/v2', {
+    'Content-Type': 'application/json'
 });
 
-api.get('/users')
-    .then(users => console.log('Користувачі:', users));
+api.get('/pet/findByStatus?status=available')
+    .then(pets => console.log('Тварини:', pets));
 
-api.post('/users', { name: 'Олена', email: 'olena@example.com' })
-    .then(user => console.log('Створено:', user));
+api.post('/pet', { 
+    id: 0,
+    name: 'Барсик', 
+    status: 'available',
+    category: { id: 1, name: 'Коти' },
+    photoUrls: ['https://example.com/cat.jpg']
+})
+    .then(pet => console.log('Створено:', pet));
 
 // ============================================
 // Висновок

@@ -10,7 +10,7 @@
 // ============================================
 
 // fetch() повертає Promise
-fetch('https://api.example.com/users')
+fetch('https://petstore.swagger.io/v2/pet/1')
     .then(response => {
         // response - це Response об'єкт
         console.log('Статус:', response.status);
@@ -18,7 +18,7 @@ fetch('https://api.example.com/users')
         return response.json(); // Парсинг JSON
     })
     .then(data => {
-        console.log('Дані:', data);
+        console.log('Дані тварини:', data);
     })
     .catch(error => {
         console.error('Помилка:', error);
@@ -28,7 +28,7 @@ fetch('https://api.example.com/users')
 // Приклад 2: Перевірка статусу відповіді
 // ============================================
 
-fetch('https://api.example.com/users')
+fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available')
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP помилка! статус: ${response.status}`);
@@ -36,7 +36,7 @@ fetch('https://api.example.com/users')
         return response.json();
     })
     .then(data => {
-        console.log('Дані:', data);
+        console.log('Доступні тварини:', data);
     })
     .catch(error => {
         console.error('Помилка:', error.message);
@@ -46,31 +46,30 @@ fetch('https://api.example.com/users')
 // Приклад 3: Різні формати відповіді
 // ============================================
 
-// JSON
-fetch('https://api.example.com/data.json')
+// JSON - отримання тварини
+fetch('https://petstore.swagger.io/v2/pet/1')
     .then(response => response.json())
-    .then(data => console.log('JSON:', data));
+    .then(data => console.log('JSON дані тварини:', data));
 
-// Текст
-fetch('https://api.example.com/data.txt')
+// Текст - отримання інвентаря (повертає JSON, але можна як текст)
+fetch('https://petstore.swagger.io/v2/store/inventory')
     .then(response => response.text())
-    .then(text => console.log('Текст:', text));
+    .then(text => console.log('Текст відповіді:', text));
 
-// Бінарні дані (Blob)
-fetch('https://api.example.com/image.jpg')
-    .then(response => response.blob())
-    .then(blob => {
-        console.log('Blob:', blob);
-        // Можна створити URL для зображення
-        const imageUrl = URL.createObjectURL(blob);
-        console.log('URL зображення:', imageUrl);
+// Бінарні дані (Blob) - приклад з фото тварини (якщо API підтримує)
+fetch('https://petstore.swagger.io/v2/pet/1')
+    .then(response => response.json())
+    .then(pet => {
+        if (pet.photoUrls && pet.photoUrls.length > 0) {
+            console.log('URL фото тварини:', pet.photoUrls[0]);
+        }
     });
 
 // ============================================
 // Приклад 4: Обробка помилок мережі
 // ============================================
 
-fetch('https://api.example.com/users')
+fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available')
     .then(response => {
         if (!response.ok) {
             throw new Error(`Помилка сервера: ${response.status}`);
@@ -95,14 +94,14 @@ fetch('https://api.example.com/users')
 
 async function fetchData() {
     try {
-        const response = await fetch('https://api.example.com/users');
+        const response = await fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available');
         
         if (!response.ok) {
             throw new Error(`HTTP помилка! статус: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('Дані:', data);
+        console.log('Дані тварин:', data);
         return data;
     } catch (error) {
         console.error('Помилка:', error.message);
@@ -116,7 +115,7 @@ fetchData();
 // Приклад 6: Отримання заголовків відповіді
 // ============================================
 
-fetch('https://api.example.com/users')
+fetch('https://petstore.swagger.io/v2/pet/1')
     .then(response => {
         // Отримання конкретного заголовка
         const contentType = response.headers.get('content-type');
@@ -130,7 +129,7 @@ fetch('https://api.example.com/users')
         return response.json();
     })
     .then(data => {
-        console.log('Дані:', data);
+        console.log('Дані тварини:', data);
     });
 
 // ============================================
@@ -138,12 +137,12 @@ fetch('https://api.example.com/users')
 // ============================================
 
 async function fetchWithContentTypeCheck() {
-    const response = await fetch('https://api.example.com/data');
+    const response = await fetch('https://petstore.swagger.io/v2/store/inventory');
     const contentType = response.headers.get('content-type');
     
     if (contentType && contentType.includes('application/json')) {
         const data = await response.json();
-        console.log('JSON дані:', data);
+        console.log('JSON дані інвентаря:', data);
     } else {
         const text = await response.text();
         console.log('Текст:', text);
@@ -157,7 +156,7 @@ fetchWithContentTypeCheck();
 // ============================================
 
 async function handleDifferentStatuses() {
-    const response = await fetch('https://api.example.com/users');
+    const response = await fetch('https://petstore.swagger.io/v2/pet/999999'); // Неіснуючий ID
     
     switch (response.status) {
         case 200:
@@ -165,7 +164,7 @@ async function handleDifferentStatuses() {
             console.log('Успіх:', data);
             break;
         case 404:
-            console.error('Ресурс не знайдено');
+            console.error('Тварину не знайдено');
             break;
         case 500:
             console.error('Помилка сервера');
@@ -185,9 +184,9 @@ const controller = new AbortController();
 const signal = controller.signal;
 
 // Запуск запиту
-const fetchPromise = fetch('https://api.example.com/users', { signal })
+const fetchPromise = fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available', { signal })
     .then(response => response.json())
-    .then(data => console.log('Дані:', data))
+    .then(data => console.log('Дані тварин:', data))
     .catch(error => {
         if (error.name === 'AbortError') {
             console.log('Запит скасовано');
@@ -241,7 +240,7 @@ async function safeFetch(url, options = {}) {
 }
 
 // Використання
-safeFetch('https://api.example.com/users')
+safeFetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available')
     .then(result => {
         if (result.success) {
             console.log('Успіх:', result.data);

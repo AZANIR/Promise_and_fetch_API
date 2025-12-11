@@ -11,7 +11,7 @@
 // Приклад 1: Базова обробка помилок
 // ============================================
 
-fetch('https://api.example.com/users')
+fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available')
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP помилка! статус: ${response.status}`);
@@ -31,7 +31,7 @@ fetch('https://api.example.com/users')
 
 async function handleDifferentErrors() {
     try {
-        const response = await fetch('https://api.example.com/users');
+        const response = await fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available');
         
         if (!response.ok) {
             // HTTP помилка (4xx, 5xx)
@@ -69,7 +69,7 @@ handleDifferentErrors();
 
 async function detailedErrorHandling() {
     try {
-        const response = await fetch('https://api.example.com/users');
+        const response = await fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available');
         
         if (!response.ok) {
             // Спробувати отримати деталі помилки з сервера
@@ -102,7 +102,7 @@ detailedErrorHandling();
 
 async function handleNetworkErrors() {
     try {
-        const response = await fetch('https://api.example.com/users');
+        const response = await fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available');
         return await response.json();
     } catch (error) {
         if (error instanceof TypeError) {
@@ -152,7 +152,7 @@ async function fetchWithTimeout(url, timeout = 5000) {
     }
 }
 
-fetchWithTimeout('https://api.example.com/users', 2000)
+fetchWithTimeout('https://petstore.swagger.io/v2/pet/findByStatus?status=available', 2000)
     .then(data => console.log('Дані:', data))
     .catch(error => console.error('Помилка:', error.message));
 
@@ -188,7 +188,7 @@ async function fetchWithRetry(url, options = {}, maxRetries = 3) {
     }
 }
 
-fetchWithRetry('https://api.example.com/users')
+fetchWithRetry('https://petstore.swagger.io/v2/pet/findByStatus?status=available')
     .then(data => console.log('Дані:', data))
     .catch(error => console.error('Всі спроби не вдалися:', error.message));
 
@@ -198,7 +198,7 @@ fetchWithRetry('https://api.example.com/users')
 
 async function handleCORSErrors() {
     try {
-        const response = await fetch('https://api.example.com/users', {
+        const response = await fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available', {
             mode: 'cors',
             credentials: 'include'
         });
@@ -281,7 +281,7 @@ async function safeFetch(url, options = {}) {
 }
 
 // Використання
-safeFetch('https://api.example.com/users')
+safeFetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available')
     .then(result => {
         if (result.success) {
             console.log('Успіх:', result.data);
@@ -341,7 +341,7 @@ async function testableFetch(url, options = {}) {
     }
 }
 
-testableFetch('https://api.example.com/users')
+testableFetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available')
     .then(result => {
         console.log('Результат тестування:', result);
     });

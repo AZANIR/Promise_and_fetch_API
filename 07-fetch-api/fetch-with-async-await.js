@@ -8,55 +8,55 @@
 // Приклад 1: Базовий async/await з fetch
 // ============================================
 
-async function fetchUsers() {
+async function fetchPets() {
     try {
-        const response = await fetch('https://api.example.com/users');
-        const users = await response.json();
-        console.log('Користувачі:', users);
-        return users;
+        const response = await fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available');
+        const pets = await response.json();
+        console.log('Тварини:', pets);
+        return pets;
     } catch (error) {
         console.error('Помилка:', error);
         throw error;
     }
 }
 
-fetchUsers();
+fetchPets();
 
 // ============================================
 // Приклад 2: Послідовні запити
 // ============================================
 
-async function fetchUserData(userId) {
+async function fetchPetData(petId) {
     try {
-        // Спочатку отримуємо користувача
-        const userResponse = await fetch(`https://api.example.com/users/${userId}`);
-        if (!userResponse.ok) {
-            throw new Error(`HTTP ${userResponse.status}: ${userResponse.statusText}`);
+        // Спочатку отримуємо тварину
+        const petResponse = await fetch(`https://petstore.swagger.io/v2/pet/${petId}`);
+        if (!petResponse.ok) {
+            throw new Error(`HTTP ${petResponse.status}: ${petResponse.statusText}`);
         }
-        const user = await userResponse.json();
+        const pet = await petResponse.json();
         
-        // Потім отримуємо пости користувача
-        const postsResponse = await fetch(`https://api.example.com/users/${userId}/posts`);
-        if (!postsResponse.ok) {
-            throw new Error(`HTTP ${postsResponse.status}: ${postsResponse.statusText}`);
+        // Потім отримуємо інвентар магазину
+        const inventoryResponse = await fetch('https://petstore.swagger.io/v2/store/inventory');
+        if (!inventoryResponse.ok) {
+            throw new Error(`HTTP ${inventoryResponse.status}: ${inventoryResponse.statusText}`);
         }
-        const posts = await postsResponse.json();
+        const inventory = await inventoryResponse.json();
         
-        // Потім отримуємо коментарі
-        const commentsResponse = await fetch(`https://api.example.com/users/${userId}/comments`);
-        if (!commentsResponse.ok) {
-            throw new Error(`HTTP ${commentsResponse.status}: ${commentsResponse.statusText}`);
+        // Потім отримуємо тварин за статусом
+        const petsByStatusResponse = await fetch(`https://petstore.swagger.io/v2/pet/findByStatus?status=${pet.status || 'available'}`);
+        if (!petsByStatusResponse.ok) {
+            throw new Error(`HTTP ${petsByStatusResponse.status}: ${petsByStatusResponse.statusText}`);
         }
-        const comments = await commentsResponse.json();
+        const petsByStatus = await petsByStatusResponse.json();
         
-        return { user, posts, comments };
+        return { pet, inventory, petsByStatus };
     } catch (error) {
         console.error('Помилка завантаження даних:', error.message);
         throw error;
     }
 }
 
-fetchUserData(1)
+fetchPetData(1)
     .then(data => console.log('Всі дані:', data))
     .catch(error => console.error('Помилка:', error.message));
 
@@ -64,35 +64,35 @@ fetchUserData(1)
 // Приклад 3: Паралельні запити з Promise.all()
 // ============================================
 
-async function fetchUserDataParallel(userId) {
+async function fetchPetDataParallel(petId) {
     try {
         // Всі запити виконуються одночасно
-        const [userResponse, postsResponse, commentsResponse] = await Promise.all([
-            fetch(`https://api.example.com/users/${userId}`),
-            fetch(`https://api.example.com/users/${userId}/posts`),
-            fetch(`https://api.example.com/users/${userId}/comments`)
+        const [petResponse, inventoryResponse, availablePetsResponse] = await Promise.all([
+            fetch(`https://petstore.swagger.io/v2/pet/${petId}`),
+            fetch('https://petstore.swagger.io/v2/store/inventory'),
+            fetch('https://petstore.swagger.io/v2/pet/findByStatus?status=available')
         ]);
         
         // Перевірка статусів
-        if (!userResponse.ok || !postsResponse.ok || !commentsResponse.ok) {
+        if (!petResponse.ok || !inventoryResponse.ok || !availablePetsResponse.ok) {
             throw new Error('Один або кілька запитів не вдалися');
         }
         
         // Парсинг всіх відповідей
-        const [user, posts, comments] = await Promise.all([
-            userResponse.json(),
-            postsResponse.json(),
-            commentsResponse.json()
+        const [pet, inventory, availablePets] = await Promise.all([
+            petResponse.json(),
+            inventoryResponse.json(),
+            availablePetsResponse.json()
         ]);
         
-        return { user, posts, comments };
+        return { pet, inventory, availablePets };
     } catch (error) {
         console.error('Помилка:', error.message);
         throw error;
     }
 }
 
-fetchUserDataParallel(1)
+fetchPetDataParallel(1)
     .then(data => console.log('Всі дані (паралельно):', data))
     .catch(error => console.error('Помилка:', error.message));
 
@@ -100,14 +100,14 @@ fetchUserDataParallel(1)
 // Приклад 4: POST запит з async/await
 // ============================================
 
-async function createUser(userData) {
+async function createPet(petData) {
     try {
-        const response = await fetch('https://api.example.com/users', {
+        const response = await fetch('https://petstore.swagger.io/v2/pet', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(userData)
+            body: JSON.stringify(petData)
         });
         
         if (!response.ok) {
@@ -115,65 +115,79 @@ async function createUser(userData) {
             throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
         }
         
-        const newUser = await response.json();
-        console.log('Користувач створено:', newUser);
-        return newUser;
+        const newPet = await response.json();
+        console.log('Тварину створено:', newPet);
+        return newPet;
     } catch (error) {
-        console.error('Помилка створення користувача:', error.message);
+        console.error('Помилка створення тварини:', error.message);
         throw error;
     }
 }
 
-createUser({ name: 'Олена', email: 'olena@example.com' })
-    .then(user => console.log('Результат:', user))
+createPet({ 
+    id: 0,
+    name: 'Барсик',
+    status: 'available',
+    category: { id: 1, name: 'Коти' },
+    photoUrls: ['https://example.com/cat.jpg']
+})
+    .then(pet => console.log('Результат:', pet))
     .catch(error => console.error('Помилка:', error.message));
 
 // ============================================
 // Приклад 5: PUT запит з async/await
 // ============================================
 
-async function updateUser(userId, userData) {
+async function updatePet(petId, petData) {
     try {
-        const response = await fetch(`https://api.example.com/users/${userId}`, {
+        const response = await fetch(`https://petstore.swagger.io/v2/pet`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(userData)
+            body: JSON.stringify({ ...petData, id: petId })
         });
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        const updatedUser = await response.json();
-        console.log('Користувач оновлено:', updatedUser);
-        return updatedUser;
+        const updatedPet = await response.json();
+        console.log('Тварину оновлено:', updatedPet);
+        return updatedPet;
     } catch (error) {
         console.error('Помилка оновлення:', error.message);
         throw error;
     }
 }
 
-updateUser(1, { name: 'Олена Оновлена', email: 'olena.updated@example.com' })
-    .then(user => console.log('Оновлено:', user))
+updatePet(1, { 
+    name: 'Барсик Оновлений', 
+    status: 'sold',
+    category: { id: 1, name: 'Коти' },
+    photoUrls: ['https://example.com/cat-updated.jpg']
+})
+    .then(pet => console.log('Оновлено:', pet))
     .catch(error => console.error('Помилка:', error.message));
 
 // ============================================
 // Приклад 6: DELETE запит з async/await
 // ============================================
 
-async function deleteUser(userId) {
+async function deletePet(petId) {
     try {
-        const response = await fetch(`https://api.example.com/users/${userId}`, {
-            method: 'DELETE'
+        const response = await fetch(`https://petstore.swagger.io/v2/pet/${petId}`, {
+            method: 'DELETE',
+            headers: {
+                'api_key': 'special-key' // Petstore API вимагає api_key для DELETE
+            }
         });
         
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        console.log('Користувач видалено');
+        console.log('Тварину видалено');
         return true;
     } catch (error) {
         console.error('Помилка видалення:', error.message);
@@ -181,7 +195,7 @@ async function deleteUser(userId) {
     }
 }
 
-deleteUser(1)
+deletePet(1)
     .then(success => console.log('Видалення успішне:', success))
     .catch(error => console.error('Помилка:', error.message));
 
@@ -223,7 +237,7 @@ async function fetchWithDetailedErrorHandling(url) {
     }
 }
 
-fetchWithDetailedErrorHandling('https://api.example.com/users')
+fetchWithDetailedErrorHandling('https://petstore.swagger.io/v2/pet/findByStatus?status=available')
     .then(data => console.log('Дані:', data))
     .catch(error => console.error('Помилка:', error.message));
 
@@ -307,27 +321,34 @@ class ApiClient {
 }
 
 // Використання
-const api = new ApiClient('https://api.example.com', {
-    'Authorization': 'Bearer token123'
+const api = new ApiClient('https://petstore.swagger.io/v2', {
+    'Content-Type': 'application/json'
 });
 
 async function useApiClient() {
     try {
-        const users = await api.get('/users');
-        console.log('Користувачі:', users);
+        const pets = await api.get('/pet/findByStatus?status=available');
+        console.log('Тварини:', pets);
         
-        const newUser = await api.post('/users', {
-            name: 'Олена',
-            email: 'olena@example.com'
+        const newPet = await api.post('/pet', {
+            id: 0,
+            name: 'Мурзик',
+            status: 'available',
+            category: { id: 1, name: 'Коти' },
+            photoUrls: ['https://example.com/cat.jpg']
         });
-        console.log('Створено:', newUser);
+        console.log('Створено:', newPet);
         
-        const updatedUser = await api.put(`/users/${newUser.id}`, {
-            name: 'Олена Оновлена'
+        const updatedPet = await api.put('/pet', {
+            ...newPet,
+            name: 'Мурзик Оновлений',
+            status: 'sold'
         });
-        console.log('Оновлено:', updatedUser);
+        console.log('Оновлено:', updatedPet);
         
-        await api.delete(`/users/${newUser.id}`);
+        await api.delete(`/pet/${updatedPet.id}`, {
+            headers: { 'api_key': 'special-key' }
+        });
         console.log('Видалено');
     } catch (error) {
         console.error('Помилка API:', error.message);

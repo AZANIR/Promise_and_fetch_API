@@ -12,6 +12,7 @@ describe('Promises', () => {
             return promise.then(result => {
                 expect(result).to.equal('Успіх');
             });
+            done();
         });
         
         it('повинен створити rejected Promise', () => {
@@ -65,7 +66,7 @@ describe('Promises', () => {
         it('повинен виконати асинхронну операцію', () => {
             function asyncOperation() {
                 return new Promise(resolve => {
-                    setTimeout(() => resolve('Готово'), 100);
+                    setTimeout(() => resolve('Готово'), 1000);
                 });
             }
             

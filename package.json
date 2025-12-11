@@ -6,6 +6,7 @@
   "scripts": {
     "test": "mocha '**/*.test.js' --timeout 10000",
     "test:watch": "mocha '**/*.test.js' --watch --timeout 10000",
+    "test:one:file": "mocha 04-promises-basics/test-automation/promises.test.js --watch --timeout 10000",
     "test:playwright": "playwright test",
     "test:playwright:ui": "playwright test --ui"
   },

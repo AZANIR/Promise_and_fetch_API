@@ -332,3 +332,10 @@ function logError(message) {
  * - Обирайте підхід залежно від складності операції
  */
 
+// Виклик функцій для демонстрації
+console.log('=== Promise підхід ===');
+fetchDataPromise();
+
+console.log('\n=== async/await підхід ===');
+fetchDataAsync();
+

@@ -246,9 +246,8 @@ function step2Promise(data) {
 
 // Без callback hell:
 step1Promise()
+    .then(step1Promise)
     .then(step2Promise)
-    .then(step3Promise)
-    .then(step4Promise)
     .then(result => console.log('Результат:', result))
     .catch(error => console.error('Помилка:', error));
 
